@@ -1,0 +1,6 @@
+pyramid
+WebError
+colander
+deform
+couchdbkit
+WebError
