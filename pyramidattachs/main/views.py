@@ -1,13 +1,26 @@
 from pyramid.response import Response
+from pyramid.renderers import render_to_response
+
 from .models import Entry
+
 import deform
 import couchdbkit
 
 def list_entries(request):
-    pass
+    all_docs = request.db.view('all/all_docs')        
+    return render_to_response('templates/list.pt',
+                              {'result':all_docs.all()},
+                              request=request)
     
 def view_entry(request):
-    pass
+    doc = request.db.get(request.matchdict['id'])
+
+    return render_to_response('templates/view.pt',
+                              {'title':doc['title'],
+                               'attach':doc['attachment'],
+                               'about':doc['description'],
+                               '_id': doc['_id']},
+                              request=request)
 
 def insert_entry(request):
     entry_schema = Entry.get_schema()
@@ -19,12 +32,9 @@ def insert_entry(request):
         try:
             appstruct = entry_form.validate(controls)
         except deform.ValidationFailure, e:
-            return Response(e.render())
-  
-        appstruct['type'] = 'Entry' #FIXME        
+            return Response(e.render())       
 
         entry = Entry.from_python(appstruct)
-        entry._id = '10'
         entry_id = entry.save(request.db)
         
         return Response('Inserido com sucesso sob o ID ' + str(entry_id))
@@ -36,21 +46,20 @@ def edit_entry(request):
     entry_form = deform.Form(entry_schema, buttons=('submit',))
     
     if 'submit' in request.POST:
-        #TODO
         controls = request.POST.items()
         try:
             appstruct = entry_form.validate(controls)
         except deform.ValidationFailure, e:
             return Response(e.render())
-        appstruct['type'] = 'Entry' #FIXME
-        appstruct['_rev'] = appstruct['_rev']+'1'
+        
+        rev = request.db.get(request.matchdict['id'])['_rev']
+        id = request.matchdict['id']
         entry = Entry.from_python(appstruct)
-        entry_id = entry.save(request.db)
+        entry_id = entry.save(request.db, _id=id, _rev=rev)
         
-        return Response('Inserido com sucesso sob o ID ' + str(entry_id))
+        return Response('Atualizado com sucesso sob o ID ' + str(entry_id))
 
-    else:
-        
+    else:        
         try:
            entry = request.db.get(request.matchdict['id'])
         except couchdbkit.ResourceNotFound:
