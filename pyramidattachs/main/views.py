@@ -52,10 +52,12 @@ def edit_entry(request):
         except deform.ValidationFailure, e:
             return Response(e.render())
         
-        rev = request.db.get(request.matchdict['id'])['_rev']
-        id = request.matchdict['id']
         entry = Entry.from_python(appstruct)
-        entry_id = entry.save(request.db, _id=id, _rev=rev)
+        
+        entry._id = request.matchdict['id']
+        entry._rev = request.db.get(entry._id)['_rev']
+
+        entry_id = entry.save(request.db)
         
         response_text = '''<html>
                         <p>Atualizado com sucesso sob o ID %s </p>
