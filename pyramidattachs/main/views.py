@@ -57,7 +57,11 @@ def edit_entry(request):
         entry = Entry.from_python(appstruct)
         entry_id = entry.save(request.db, _id=id, _rev=rev)
         
-        return Response('Atualizado com sucesso sob o ID ' + str(entry_id))
+        response_text = '''<html>
+                        <p>Atualizado com sucesso sob o ID %s </p>
+                        <a href="/list">Voltar</a>
+                    </html>''' % str(entry_id)
+        return Response(response_text)
 
     else:        
         try:
