@@ -19,6 +19,7 @@ def view_entry(request):
     doc = request.db.get(request.matchdict['id'])
     
     img_url = static_url('pyramidattachs:attachments/%s/%s', request)  % (doc['_id'], doc['attachment'])
+    
     return render_to_response('templates/view.pt',
                               {'title':doc['title'],
                                'attach':img_url,
