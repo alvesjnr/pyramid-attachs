@@ -20,6 +20,8 @@ pyramidattachs/views.py
 pyramidattachs/main/__init__.py
 pyramidattachs/main/models.py
 pyramidattachs/main/views.py
+pyramidattachs/main/templates/list.pt
+pyramidattachs/main/templates/view.pt
 pyramidattachs/static/favicon.ico
 pyramidattachs/static/footerbg.png
 pyramidattachs/static/headerbg.png

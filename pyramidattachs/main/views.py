@@ -1,10 +1,13 @@
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
+from pyramid.url import static_url
 
 from .models import Entry
 
 import deform
 import couchdbkit
+import Image
+import StringIO
 
 def list_entries(request):
     all_docs = request.db.view('all/all_docs')        
@@ -14,10 +17,11 @@ def list_entries(request):
     
 def view_entry(request):
     doc = request.db.get(request.matchdict['id'])
-
+    
+    img_url = static_url('pyramidattachs:attachments/%s/%s', request)  % (doc['_id'], doc['attachment'])
     return render_to_response('templates/view.pt',
                               {'title':doc['title'],
-                               'attach':doc['attachment'],
+                               'attach':img_url,
                                'about':doc['description'],
                                '_id': doc['_id']},
                               request=request)
@@ -27,7 +31,6 @@ def insert_entry(request):
     entry_form = deform.Form(entry_schema, buttons=('submit',))
     
     if 'submit' in request.POST:
-        
         controls = request.POST.items()
         try:
             appstruct = entry_form.validate(controls)

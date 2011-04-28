@@ -24,7 +24,9 @@ def main(global_config, **settings):
     conn = couchdbkit.Server(db_uri)
     config.registry.settings['db_conn'] = conn
     config.add_subscriber(add_couch_db, NewRequest) 
-
+    
+    attachs_uri = settings['db_uri'] + '/' + settings['db_name']
+    config.add_static_view(attachs_uri, 'pyramidattachs:attachments')
     config.add_static_view('static', 'pyramidattachs:static')
     return config.make_wsgi_app()
 
