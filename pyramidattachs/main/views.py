@@ -18,7 +18,7 @@ def list_entries(request):
 def view_entry(request):
     doc = request.db.get(request.matchdict['id'])
     
-    img_url = static_url('pyramidattachs:attachments/%s/%s', request)  % (doc['_id'], doc['attachment'])
+    img_url = static_url('pyramidattachs:attachments/%s/%s', request)  % (doc['_id'], doc['attachment']['filename'])
     
     return render_to_response('templates/view.pt',
                               {'title':doc['title'],
@@ -39,9 +39,9 @@ def insert_entry(request):
             return Response(e.render())       
 
         entry = Entry.from_python(appstruct)
-        entry_id = entry.save(request.db)
+        entry.save(request.db)
         
-        return Response('Inserido com sucesso sob o ID ' + str(entry_id))
+        return Response('Inserido com sucesso sob o ID ' + entry._id)
 
     return Response(entry_form.render())
 
@@ -66,7 +66,7 @@ def edit_entry(request):
         response_text = '''<html>
                         <p>Atualizado com sucesso sob o ID %s </p>
                         <a href="/list">Voltar</a>
-                    </html>''' % str(entry_id)
+                    </html>''' % entry._id
         return Response(response_text)
 
     else:        
