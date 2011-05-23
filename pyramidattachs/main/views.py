@@ -10,7 +10,7 @@ import Image
 import StringIO
 
 def list_entries(request):
-    all_docs = request.db.view('all/all_docs')        
+    all_docs = request.db.view('pyattachs/all_docs')        
     return render_to_response('templates/list.pt',
                               {'result':all_docs.all()},
                               request=request)
